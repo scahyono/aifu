@@ -1,6 +1,7 @@
 import openai
 import logging
 from dotenv import load_dotenv
+import shutil
 import os
 
 # Load environment variables from .env file
@@ -10,9 +11,32 @@ load_dotenv()
 api_key = os.environ.get('OPENAI_API_KEY')
 MODEL="gpt-4"
 TOKEN_TARGET = 8000 # increase if the bot is forgetful
-waifu="Nami" # change to your waifu's name
-# lower case, no spaces, no special characters    
-waifu_location = waifu.lower().replace(" ", "_").replace("'", "")
+
+# Check if the aifus folder is empty
+if not os.listdir('aifus'):
+    # If empty, copy each subdirectory from aifus_examples to aifus
+    for item in os.listdir('aifus_examples'):
+        s = os.path.join('aifus_examples', item)
+        d = os.path.join('aifus', item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, False, None)
+
+# List the content of the aifus folder
+aifus = next(os.walk('aifus'))[1]
+
+# If only one AIfu, choose it automatically, else ask the user to choose an AIfu
+if len(aifus) == 1:
+    waifu_location = aifus[0]
+else:
+    print("Choose an AIfu to chat with:")
+    for index, aifu in enumerate(aifus):
+        print(f"{index + 1}. {aifu.replace('_', ' ').title()}")
+
+    choice = int(input("Enter the number of your choice: "))
+    waifu_location = aifus[choice - 1]
+
+# Set the waifu as the camel case of the waifu_location
+waifu = waifu_location.replace("_", " ").title()
 
 # Set up logging with timestamp
 logging.basicConfig(filename=f'aifus/{waifu_location}/aifu_chat.log', level=logging.INFO, format='%(asctime)s %(message)s')
@@ -93,6 +117,11 @@ def aifu_response(user_input):
 
 def chat():
     print("Hello! Type 'bye' to exit.")
+
+    # Send a greeting message automatically
+    greeting_response = aifu_response("If you know my name, welcome me back, continue the last conversation, then stop (If you don't know my name then greet me and ask)")
+    print(f"\033[94m{waifu}: \033[0m{greeting_response}")
+
     while True:
         user_input = input("\033[92mYou: \033[0m")  # \033[92m is the ANSI escape code for green text, \033[0m resets the text color
         if user_input.lower() in ('bye', 'exit', 'quit'):
