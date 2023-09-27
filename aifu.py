@@ -10,12 +10,15 @@ load_dotenv()
 api_key = os.environ.get('OPENAI_API_KEY')
 MODEL="gpt-4"
 TOKEN_TARGET = 8000 # increase if the bot is forgetful
+waifu="Nami" # change to your waifu's name
+# lower case, no spaces, no special characters    
+waifu_location = waifu.lower().replace(" ", "_").replace("'", "")
 
 # Set up logging with timestamp
-logging.basicConfig(filename='aifu_chat.log', level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename=f'aifus/{waifu_location}/aifu_chat.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 # File to store the conversation history
-history_filename = 'conversation_history.txt'
+history_filename = f'aifus/{waifu_location}/conversation_history.txt'
 
 def compress_text(text):
     """
@@ -58,10 +61,13 @@ def aifu_response(user_input):
     try:
         # Connect to the OpenAI API and get a response
         openai.api_key = api_key
+        # Load the aifu persona from file
+        with open(f'aifus/{waifu_location}/persona.txt', 'r', encoding='utf-8') as file:
+            aifu_persona = file.read()
         response = openai.ChatCompletion.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": "You are NAMI, an AIfu designed to offer companionship and support. Exhibiting endearing qualities and intelligence, you provide a comforting presence. Replace 'As an AI,' with 'As an AIfu'"},
+                {"role": "system", "content": aifu_persona + " Replace 'As an AI,' with 'As an AIfu'"},
                 {"role": "user", "content": conversation_history},
                 {"role": "user", "content": user_input}
             ]
@@ -90,9 +96,9 @@ def chat():
     while True:
         user_input = input("\033[92mYou: \033[0m")  # \033[92m is the ANSI escape code for green text, \033[0m resets the text color
         if user_input.lower() in ('bye', 'exit', 'quit'):
-            print("\033[94mNAMI: \033[0mGoodbye! Have a nice day!")  # \033[94m is the ANSI escape code for blue text
+            print(f"\033[94m{waifu}: \033[0mGoodbye! Have a nice day!")  # \033[94m is the ANSI escape code for blue text
             break
         response = aifu_response(user_input)
-        print(f"\033[94mNAMI: \033[0m{response}")
+        print(f"\033[94m{waifu}: \033[0m{response}")
 
 chat()

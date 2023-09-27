@@ -1,6 +1,6 @@
 # AIfu Chatbot
 
-Chat with you AIfu (AI waifu assistant) via a simple chatbot built using OpenAI's GPT-4 model. It is designed to offer companionship and support, exhibiting endearing qualities and intelligence to provide a comforting presence to users. The chatbot maintains a conversation history, ensuring a coherent and context-aware interaction experience.
+Chat with your AIfu (AI waifu companion) via a simple chatbot built using OpenAI's GPT-4 model. It is designed to offer companionship and support, exhibiting endearing qualities and intelligence to provide a comforting presence to users. The chatbot maintains a conversation history, ensuring a coherent and context-aware interaction experience.
 
 ## Features
 
@@ -8,6 +8,8 @@ Chat with you AIfu (AI waifu assistant) via a simple chatbot built using OpenAI'
 - Conversation history management
 - Automatic text compression for long conversation histories
 - Colored terminal output for improved user experience
+- Externalized AIfu persona and conversation history
+- Organized directory structure for managing multiple AIfus
 
 ## Installing Dependencies
 
@@ -38,12 +40,31 @@ You will be greeted by AIfu and can start chatting immediately. To end the conve
 
 ## Customization
 
-You can customize various aspects of AIfu, such as the model used (`MODEL` variable) and the token target for text compression (`TOKEN_TARGET` variable), by modifying the `aifu.py` script. 
-You can customize the conversation context by editing the `conversation_history.txt`
+You can customize various aspects of AIfu, such as:
+
+- The model used (`MODEL` variable)
+- The token target for text compression (`TOKEN_TARGET` variable)
+- The name of your AIfu (`waifu` variable)
+
+By modifying the `aifu.py` script, you can also customize the conversation context by editing the `persona.txt` file located in the `aifus/{waifu_location}` directory.
+
+## Directory Structure
+
+```
+AIfu/
+├── aifus/
+│   └── {waifu_location}/
+│       ├── persona.txt
+│       ├── conversation_history.txt
+│       └── aifu_chat.log
+├── .env
+├── aifu.py
+└── requirements.txt
+```
 
 ## Troubleshooting
 
-If you encounter any issues while running AIfu, check the `aifu_chat.log` file for detailed error logs. This can help in diagnosing and resolving any problems.
+If you encounter any issues while running AIfu, check the `aifus/{waifu_location}/aifu_chat.log` file for detailed error logs. This can help in diagnosing and resolving any problems.
 
 ## Contributing
 
