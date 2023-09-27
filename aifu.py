@@ -26,23 +26,23 @@ aifus = next(os.walk('aifus'))[1]
 
 # If only one AIfu, choose it automatically, else ask the user to choose an AIfu
 if len(aifus) == 1:
-    waifu_location = aifus[0]
+    aifu_location = aifus[0]
 else:
     print("Choose an AIfu to chat with:")
     for index, aifu in enumerate(aifus):
         print(f"{index + 1}. {aifu.replace('_', ' ').title()}")
 
     choice = int(input("Enter the number of your choice: "))
-    waifu_location = aifus[choice - 1]
+    aifu_location = aifus[choice - 1]
 
-# Set the waifu as the camel case of the waifu_location
-waifu = waifu_location.replace("_", " ").title()
+# Set the aifu as the camel case of the aifu_location
+aifu = aifu_location.replace("_", " ").title()
 
 # Set up logging with timestamp
-logging.basicConfig(filename=f'aifus/{waifu_location}/aifu_chat.log', level=logging.INFO, format='%(asctime)s %(message)s')
+logging.basicConfig(filename=f'aifus/{aifu_location}/aifu_chat.log', level=logging.INFO, format='%(asctime)s %(message)s')
 
 # File to store the conversation history
-history_filename = f'aifus/{waifu_location}/conversation_history.txt'
+history_filename = f'aifus/{aifu_location}/conversation_history.txt'
 
 def compress_text(text):
     """
@@ -86,7 +86,7 @@ def aifu_response(user_input):
         # Connect to the OpenAI API and get a response
         openai.api_key = api_key
         # Load the aifu persona from file
-        with open(f'aifus/{waifu_location}/persona.txt', 'r', encoding='utf-8') as file:
+        with open(f'aifus/{aifu_location}/persona.txt', 'r', encoding='utf-8') as file:
             aifu_persona = file.read()
         response = openai.ChatCompletion.create(
             model=MODEL,
@@ -120,14 +120,14 @@ def chat():
 
     # Send a greeting message automatically
     greeting_response = aifu_response("If you know my name, welcome me back, continue the last conversation, then stop (If you don't know my name then greet me and ask)")
-    print(f"\033[94m{waifu}: \033[0m{greeting_response}")
+    print(f"\033[94m{aifu}: \033[0m{greeting_response}")
 
     while True:
         user_input = input("\033[92mYou: \033[0m")  # \033[92m is the ANSI escape code for green text, \033[0m resets the text color
         if user_input.lower() in ('bye', 'exit', 'quit'):
-            print(f"\033[94m{waifu}: \033[0mGoodbye! Have a nice day!")  # \033[94m is the ANSI escape code for blue text
+            print(f"\033[94m{aifu}: \033[0mGoodbye! Have a nice day!")  # \033[94m is the ANSI escape code for blue text
             break
         response = aifu_response(user_input)
-        print(f"\033[94m{waifu}: \033[0m{response}")
+        print(f"\033[94m{aifu}: \033[0m{response}")
 
 chat()
