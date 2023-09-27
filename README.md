@@ -31,14 +31,15 @@ OPENAI_API_KEY=your_api_key_here
 To start a conversation with AIfu, run the main script:
 
 ```bash
-python aifu_chat.py
+python aifu.py
 ```
 
 You will be greeted by AIfu and can start chatting immediately. To end the conversation, simply type `bye`, `exit`, or `quit`.
 
 ## Customization
 
-You can customize various aspects of AIfu, such as the model used (`MODEL` variable) and the token target for text compression (`TOKEN_TARGET` variable), by modifying the `aifu_chat.py` script.
+You can customize various aspects of AIfu, such as the model used (`MODEL` variable) and the token target for text compression (`TOKEN_TARGET` variable), by modifying the `aifu.py` script. 
+You can customize the conversation context by editing the `conversation_history.txt`
 
 ## Troubleshooting
 
@@ -50,4 +51,4 @@ Contributions to improve AIfu are welcome! Feel free to open an issue or submit 
 
 ## License
 
-AIfu is open-source software released under the MIT License. See the `LICENSE` file for more details.
+AIfu is open-source software released under the MIT License. See the `LICENSE.txt` file for more details.

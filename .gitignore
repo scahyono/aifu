@@ -2,3 +2,5 @@
 
 # local env files
 .env
+aifu_chat.log
+conversation_history.txt
