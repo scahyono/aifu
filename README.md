@@ -1,6 +1,7 @@
 # AIfu Chatbot
 
 Engage with your AIfu (AI waifu companion) through a straightforward chatbot utilizing OpenAI's GPT-4 model. This chatbot is crafted to provide companionship and support, showcasing endearing qualities and intelligence to offer a comforting presence to users. It maintains a conversation history for coherent and context-aware interactions.
+![AIfu](https://github.com/scahyono/aifu/assets/2072698/2101d80d-621b-40a9-971e-dbe56fedb928)
 
 ## Features
 
