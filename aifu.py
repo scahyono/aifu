@@ -73,14 +73,7 @@ def aifu_response(user_input):
     user_input = user_input.lower()
 
     # Load the conversation history from file
-    try:
-        with open(history_filename, 'r', encoding='utf-8') as file:
-            conversation_history = file.read()
-    except FileNotFoundError:
-        conversation_history = ""
-
-    # Compress the conversation history if it exceeds 4096 tokens
-    conversation_history = compress_text(conversation_history)
+    conversation_history = load_conversation_history()
 
     try:
         # Connect to the OpenAI API and get a response
@@ -88,10 +81,14 @@ def aifu_response(user_input):
         # Load the aifu persona from file
         with open(f'aifus/{aifu_location}/persona.txt', 'r', encoding='utf-8') as file:
             aifu_persona = file.read()
+        instruction = aifu_persona + " Replace 'As an AI,' with 'As an AIfu'."
+        # when user input is empty, the instruct the AIfu to introduce itself and ask for user name
+        if user_input == "":
+            instruction += " Introduce yourself and ask for my name."
         response = openai.ChatCompletion.create(
             model=MODEL,
             messages=[
-                {"role": "system", "content": aifu_persona + " Replace 'As an AI,' with 'As an AIfu'"},
+                {"role": "system", "content": instruction},
                 {"role": "user", "content": conversation_history},
                 {"role": "user", "content": user_input}
             ]
@@ -118,8 +115,13 @@ def aifu_response(user_input):
 def chat():
     print("Hello! Type 'bye' to exit.")
 
-    # Send a greeting message automatically
-    greeting_response = aifu_response("If you know my name, welcome me back, continue the last conversation, then stop (If you don't know my name then greet me and ask)")
+    conversation_history = load_conversation_history()
+    # if conversation history file is empty then ask for introuction otherwise continue the last conversation
+    if conversation_history == "":
+        greeting_response = aifu_response("")
+    else:
+        greeting_response = aifu_response("I'm back!")
+
     print(f"\033[94m{aifu}: \033[0m{greeting_response}")
 
     while True:
@@ -129,5 +131,17 @@ def chat():
             break
         response = aifu_response(user_input)
         print(f"\033[94m{aifu}: \033[0m{response}")
+
+def load_conversation_history():
+    try:
+        with open(history_filename, 'r', encoding='utf-8') as file:
+            conversation_history = file.read()
+    except FileNotFoundError:
+        conversation_history = ""
+
+    # Compress the conversation history if it exceeds 4096 tokens
+    conversation_history = compress_text(conversation_history)
+
+    return conversation_history
 
 chat()
