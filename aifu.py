@@ -1,4 +1,4 @@
-import openai
+from openai import OpenAI
 import logging
 from dotenv import load_dotenv
 import shutil
@@ -9,8 +9,11 @@ load_dotenv()
 
 # Configuration Management: Load API key from environment variables
 api_key = os.environ.get('OPENAI_API_KEY')
-MODEL="gpt-4-1106-preview" # GPT 4 Turbo has 128k token
-TOKEN_TARGET = 100000 # increase if the bot is forgetful
+MODEL="gpt-4-1106-preview" # Update this to the desired model version
+TOKEN_TARGET = 100000 # Increase if the bot is forgetful
+
+# Initialize the OpenAI client
+client = OpenAI(api_key=api_key)
 
 # Check if the aifus folder is empty
 if not os.listdir('aifus'):
@@ -57,15 +60,14 @@ def compress_text(text):
     if len(text.split()) < TOKEN_TARGET:
         return text
 
-    openai.api_key = api_key
-    response = openai.ChatCompletion.create(
+    response = client.chat.completions.create(
         model=MODEL,
-        messages=[
+        prompt=[
             {"role": "system", "content": "You are a helpful assistant that summarizes text."},
             {"role": "user", "content": f"Make {TOKEN_TARGET/2} words summary of the following text:\n\n{text}"}
         ]
     )
-    compressed_text = response.choices[0].message['content'].strip()
+    compressed_text = response.choices[0].message.content.strip()
     return compressed_text
 
 def aifu_response(user_input):
@@ -76,16 +78,14 @@ def aifu_response(user_input):
     conversation_history = load_conversation_history()
 
     try:
-        # Connect to the OpenAI API and get a response
-        openai.api_key = api_key
-        # Load the aifu persona from file
+        # Connect to the OpenAI API and get a response using the updated method
         with open(f'aifus/{aifu_location}/persona.txt', 'r', encoding='utf-8') as file:
             aifu_persona = file.read()
         instruction = aifu_persona + " Replace 'As an AI,' with 'As an AIfu'."
-        # when user input is empty, the instruct the AIfu to introduce itself and ask for user name
         if user_input == "":
             instruction += " Introduce yourself and ask for my name."
-        response = openai.ChatCompletion.create(
+
+        chat_completion = client.chat.completions.create(
             model=MODEL,
             messages=[
                 {"role": "system", "content": instruction},
@@ -93,10 +93,9 @@ def aifu_response(user_input):
                 {"role": "user", "content": user_input}
             ]
         )
-        response_content = response.choices[0].message['content'].strip()
+        response_content = chat_completion.choices[0].message.content.strip()
 
     except Exception as e:
-        # Error Handling: Return an error message
         logging.error(f"An error occurred: {e}")
         return f"An error occurred: {e}"
 

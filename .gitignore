@@ -5,3 +5,4 @@
 aifu_chat.log
 conversation_history.txt
 aifus/*
+venv/*
