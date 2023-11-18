@@ -9,8 +9,8 @@ load_dotenv()
 
 # Configuration Management: Load API key from environment variables
 api_key = os.environ.get('OPENAI_API_KEY')
-MODEL="gpt-4"
-TOKEN_TARGET = 8000 # increase if the bot is forgetful
+MODEL="gpt-4-1106-preview" # GPT 4 Turbo has 128k token
+TOKEN_TARGET = 100000 # increase if the bot is forgetful
 
 # Check if the aifus folder is empty
 if not os.listdir('aifus'):
