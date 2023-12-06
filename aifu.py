@@ -71,8 +71,6 @@ def compress_text(text):
     return compressed_text
 
 def aifu_response(user_input):
-    """Generate a response to the user input using OpenAI API."""
-    user_input = user_input.lower()
 
     # Load the conversation history from file
     conversation_history = load_conversation_history()
@@ -85,7 +83,8 @@ def aifu_response(user_input):
         if user_input == "":
             instruction += " Introduce yourself and ask for my name."
 
-        chat_completion = client.chat.completions.create(
+        response = client.chat.completions.create(
+            stream=True,
             model=MODEL,
             messages=[
                 {"role": "system", "content": instruction},
@@ -93,23 +92,31 @@ def aifu_response(user_input):
                 {"role": "user", "content": user_input}
             ]
         )
-        response_content = chat_completion.choices[0].message.content.strip()
 
     except Exception as e:
         logging.error(f"An error occurred: {e}")
         return f"An error occurred: {e}"
 
+    return response
+
+def log_conversation(user_input, response_content):
+    """
+    Log the conversation and update the conversation history.
+    :param user_input: The user's input.
+    :param response_content: The response from AIfu.
+    """
     # Log the conversation
     logging.info(f"I: {user_input} | You: {response_content}")
 
+    # Load the conversation history from file
+    conversation_history = load_conversation_history()
+
     # Add the user's message to the conversation history
-    conversation_history += f" | I: {user_input} | You: {response_content}"   
+    conversation_history += f" | I: {user_input} | You: {response_content}"
 
     # Write the updated conversation history back to the file
     with open(history_filename, 'w', encoding='utf-8') as file:
         file.write(conversation_history)
-
-    return response_content
 
 def chat():
     print("Hello! Type 'bye' to exit.")
@@ -129,7 +136,14 @@ def chat():
             print(f"\033[94m{aifu}: \033[0mGoodbye! Have a nice day!")  # \033[94m is the ANSI escape code for blue text
             break
         response = aifu_response(user_input)
-        print(f"\033[94m{aifu}: \033[0m{response}")
+        print(f"\033[94m{aifu}: \033[0m", end='')
+        fullresponse=""
+        for chunk in response:
+            if chunk.choices[0].delta.content is not None:
+                fullresponse += chunk.choices[0].delta.content
+                print(chunk.choices[0].delta.content, end='')
+        log_conversation(user_input, fullresponse)
+
 
 def load_conversation_history():
     try:
