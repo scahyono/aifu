@@ -124,26 +124,30 @@ def chat():
     conversation_history = load_conversation_history()
     # if conversation history file is empty then ask for introuction otherwise continue the last conversation
     if conversation_history == "":
-        greeting_response = aifu_response("")
+        stream = aifu_response("")
     else:
-        greeting_response = aifu_response("I'm back!")
-
-    print(f"\033[94m{aifu}: \033[0m{greeting_response}")
+        stream = aifu_response("I'm back!")
+    printResponse(stream)
 
     while True:
         user_input = input("\033[92mYou: \033[0m")  # \033[92m is the ANSI escape code for green text, \033[0m resets the text color
         if user_input.lower() in ('bye', 'exit', 'quit'):
             print(f"\033[94m{aifu}: \033[0mGoodbye! Have a nice day!")  # \033[94m is the ANSI escape code for blue text
             break
-        response = aifu_response(user_input)
-        print(f"\033[94m{aifu}: \033[0m", end='')
-        fullresponse=""
-        for chunk in response:
-            if chunk.choices[0].delta.content is not None:
-                fullresponse += chunk.choices[0].delta.content
-                print(chunk.choices[0].delta.content, end='')
+        stream = aifu_response(user_input)
+        fullresponse=printResponse(stream)
         log_conversation(user_input, fullresponse)
 
+def printResponse(response):
+    print(f"\033[94m{aifu}: \033[0m", end='')
+    fullresponse=""
+    for chunk in response:
+        chunkContent = chunk.choices[0].delta.content
+        if chunkContent is None:
+            chunkContent = "\n"
+        fullresponse += chunkContent
+        print(chunkContent, end='')
+    return fullresponse
 
 def load_conversation_history():
     try:
